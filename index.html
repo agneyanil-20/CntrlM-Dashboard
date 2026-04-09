@@ -18,87 +18,62 @@
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
 
-        <!-- Dashboard Screen (Landing: Teams) -->
+        <!-- Dashboard Screen (Step 1: Designation / Roles) -->
         <main id="dashboard" class="screen active">
-            <header class="header">
-                <div>
-                    <h1>Team Management</h1>
-                    <p>Select your team to access operations</p>
-                </div>
-                <div class="user-info-bar" id="logged-user-bar">
-                    <span id="user-display">Logged in as: <b>Guest</b></span>
-                    <button class="btn-sm" onclick="showDashboard()">Login</button>
-                </div>
+            <header class="header center">
+                <h1>Select Designation</h1>
+                <p>Choose your professional role within Cntrl M</p>
             </header>
 
-            <div class="section-badge">Service Departments</div>
             <div class="card-grid">
-                <!-- Graphic Design -->
                 <div class="card" onclick="showTeam('graphic-design')">
                     <div class="icon-box orange"><i class="ph ph-paint-brush"></i></div>
                     <div class="card-info">
-                        <h3>Graphic Design</h3>
-                        <p>3 Members</p>
+                        <h3>Graphic Designer</h3>
+                        <p>Visual Arts & Branding</p>
                     </div>
-                    <div class="card-arrow"><i class="ph ph-caret-right"></i></div>
                 </div>
-
-                <!-- Video Production -->
                 <div class="card" onclick="showTeam('video-production')">
                     <div class="icon-box orange"><i class="ph ph-video"></i></div>
                     <div class="card-info">
-                        <h3>Video Production</h3>
-                        <p>5 Members</p>
+                        <h3>Video Editor</h3>
+                        <p>Post-Production & Motion</p>
                     </div>
-                    <div class="card-arrow"><i class="ph ph-caret-right"></i></div>
                 </div>
-
-                <!-- Social Media -->
                 <div class="card" onclick="showTeam('social-media')">
                     <div class="icon-box orange"><i class="ph ph-instagram-logo"></i></div>
                     <div class="card-info">
                         <h3>Social Media</h3>
-                        <p>2 Members</p>
+                        <p>Management & Strategy</p>
                     </div>
-                    <div class="card-arrow"><i class="ph ph-caret-right"></i></div>
                 </div>
-
-                <!-- Content Writing -->
                 <div class="card" onclick="showTeam('content-writing')">
                     <div class="icon-box orange"><i class="ph ph-text-aa"></i></div>
                     <div class="card-info">
-                        <h3>Content Writing</h3>
-                        <p>1 Member</p>
+                        <h3>Content Writer</h3>
+                        <p>Copywriting & Narratives</p>
                     </div>
-                    <div class="card-arrow"><i class="ph ph-caret-right"></i></div>
                 </div>
-            </div>
-
-            <div class="view-board-cta" onclick="switchScreen('client-board')">
-                <span>View Global Client Board</span>
-                <i class="ph ph-arrow-right"></i>
             </div>
         </main>
 
         <!-- Global Client Board Screen -->
-        <main id="client-board" class="screen active">
+        <main id="client-board" class="screen">
             <header class="header">
                 <div>
                     <h1>Client Operations</h1>
-                    <p>Global overview of all deliverables</p>
+                    <p id="client-view-subtitle">Global overview of deliverables</p>
                 </div>
                 <div class="header-actions">
                     <div id="save-status" class="save-toast">Status updated</div>
-                    <div class="action-buttons">
-                        <button class="icon-btn"><i class="ph ph-bell"></i></button>
-                        <div class="user-profile-pill" onclick="switchScreen('dashboard')">
-                            <span id="user-display-short">Guest</span>
-                            <div class="avatar-sm" id="user-avatar-tiny">G</div>
-                        </div>
-                        <button id="save-btn" class="btn-primary glow" onclick="saveProgress()" style="display: none;">
-                            <i class="ph ph-sparkle"></i> Save Today's Work
-                        </button>
+                    <div class="user-profile-pill">
+                        <span id="user-display-short">Member</span>
+                        <div class="avatar-sm" id="user-avatar-tiny">M</div>
+                        <button class="logout-btn" onclick="logout()" style="margin-left: 0.5rem; background: none; border: none; font-size: 0.75rem; color: var(--primary); cursor: pointer; font-weight: 600;">Logout</button>
                     </div>
+                    <button id="save-btn" class="btn-primary glow" onclick="saveProgress()">
+                        <i class="ph ph-sparkle"></i> Save Today
+                    </button>
                 </div>
             </header>
 
@@ -188,24 +163,20 @@
             <div class="clients-feed" id="all-clients-grid"></div>
         </main>
 
-        <!-- Team Details Screen -->
+        <!-- Team Details Screen (Step 2: Names) -->
         <main id="details" class="screen">
-            <div class="back-bar">
-                <button class="back-btn" onclick="showDashboard()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                    <span>Back to Overview</span>
+            <header class="header">
+                <button class="back-link" onclick="switchScreen('dashboard')" style="background: none; border: none; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 500;">
+                    <i class="ph ph-arrow-left"></i> Back to Designations
                 </button>
-            </div>
-
-            <div class="details-header">
-                <h2 id="team-title">Team Name</h2>
-                <div class="member-count-badge">
-                    <span id="member-count">0 Members</span>
+                <div style="margin-top: 2rem;">
+                    <h2 id="team-title">Designation Members</h2>
+                    <p id="member-count">Select your name to enter password</p>
                 </div>
-            </div>
+            </header>
 
-            <div class="member-list" id="member-list">
-                <!-- Member items will be injected here -->
+            <div class="member-grid-names" id="member-list">
+                <!-- Member names injected here -->
             </div>
         </main>
 

@@ -1,4 +1,23 @@
 // --- Team & Auth Data ---
+const teams = {
+    'graphic-design': {
+        title: 'Graphic Designers',
+        members: ['Agney', 'Neha', 'Nived']
+    },
+    'video-production': {
+        title: 'Video Editors',
+        members: ['Sijin', 'Abhay', 'Adhil', 'Shaun', 'Hari']
+    },
+    'social-media': {
+        title: 'Social Media Managers',
+        members: ['Megha', 'Christi']
+    },
+    'content-writing': {
+        title: 'Content Writers',
+        members: ['Dilna']
+    }
+};
+
 const memberPasswords = {
     'Agney': 'agney123', 'Neha': 'neha123', 'Nived': 'nived123',
     'Sijin': 'sijin123', 'Abhay': 'abhay123', 'Adhil': 'adil123',
@@ -31,7 +50,6 @@ function init() {
     renderKPIs();
     renderAllClients();
     initCharts();
-    updateUIForAuth();
 }
 
 function renderKPIs() {
@@ -58,7 +76,7 @@ function renderAllClients(filteredList = allClients) {
         const initials = client.owner[0].toUpperCase();
 
         const card = document.createElement('div');
-        card.className = 'client-card anim-enter';
+        card.className = 'client-card';
         card.style.animationDelay = `${index * 0.05}s`;
 
         card.innerHTML = `
@@ -98,7 +116,7 @@ function renderAllClients(filteredList = allClients) {
                     <span>${isDone ? 'Done' : 'Mark Done'}</span>
                 </div>
             </div>
-            ${isOwner ? '<div class="owner-pill" style="position:absolute; bottom:0; right:0; border-radius: 8px 0 0 0">YOURS</div>' : ''}
+            ${isOwner ? '<div style="position:absolute; top: 0; right: 0; background: var(--primary); color: white; padding: 2px 8px; font-size: 0.6rem; font-weight: 700; border-radius: 0 0 0 8px;">YOU</div>' : ''}
         `;
         grid.appendChild(card);
     });
@@ -112,13 +130,12 @@ function initCharts() {
     if (progressChart) progressChart.destroy();
     if (contentSplitChart) contentSplitChart.destroy();
 
-    // Progress Bar Chart
     progressChart = new Chart(ctxProgress, {
         type: 'bar',
         data: {
             labels: allClients.map(c => c.name),
             datasets: [{
-                label: 'Completed',
+                label: 'Status',
                 data: allClients.map(c => (completedTasks.has(c.id) || c.status === 'completed') ? 100 : 60),
                 backgroundColor: '#f97316',
                 borderRadius: 4
@@ -131,7 +148,6 @@ function initCharts() {
         }
     });
 
-    // Content Split Donut
     const totalPosts = allClients.reduce((acc, c) => acc + c.posts, 0);
     const totalVideos = allClients.reduce((acc, c) => acc + c.videos, 0);
 
@@ -153,7 +169,86 @@ function initCharts() {
     });
 }
 
-// --- Interaction Logic ---
+// --- Navigation Logic (Step-by-Step) ---
+
+function showTeam(teamKey) {
+    const team = teams[teamKey];
+    document.getElementById('team-title').textContent = team.title;
+    document.getElementById('member-count').textContent = `Select your name among ${team.members.length} members`;
+
+    const list = document.getElementById('member-list');
+    list.innerHTML = team.members.map(name => `
+        <div class="member-card" onclick="openPasswordModal('${name}')">
+            <div class="avatar-circle">${name[0]}</div>
+            <div class="member-name">${name}</div>
+        </div>
+    `).join('');
+
+    switchScreen('details');
+}
+
+function openPasswordModal(name) {
+    window.targetMember = name;
+    document.getElementById('modal-user-name').textContent = name;
+    document.getElementById('password-modal').classList.add('active');
+    document.getElementById('secret-password').value = '';
+    setTimeout(() => document.getElementById('secret-password').focus(), 100);
+}
+
+function checkPassword() {
+    const pwd = document.getElementById('secret-password').value;
+    const name = window.targetMember;
+    if (pwd === memberPasswords[name]) {
+        currentMember = name;
+        closeModal();
+        updateUIForAuth();
+        switchScreen('client-board');
+        renderAllClients();
+        renderKPIs();
+        initCharts();
+    } else {
+        document.getElementById('password-error').style.display = 'block';
+    }
+}
+
+function updateUIForAuth() {
+    if (currentMember) {
+        document.getElementById('user-display-short').textContent = currentMember;
+        document.getElementById('user-avatar-tiny').textContent = currentMember[0];
+    }
+}
+
+function logout() {
+    currentMember = null;
+    switchScreen('dashboard');
+}
+
+function switchScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function closeModal() { document.getElementById('password-modal').classList.remove('active'); }
+
+function toggleClientTask(id, owner) {
+    if (currentMember !== owner) {
+        alert(`Access Denied: Only ${owner} can update this client.`);
+        return;
+    }
+    if (completedTasks.has(id)) completedTasks.delete(id);
+    else completedTasks.add(id);
+    renderAllClients();
+    renderKPIs();
+    initCharts();
+}
+
+function saveProgress() {
+    const toast = document.getElementById('save-status');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
 function filterClients() {
     const searchTerm = document.getElementById('clientSearch').value.toLowerCase();
     const owner = document.getElementById('ownerFilter').value;
@@ -173,89 +268,8 @@ function filterClients() {
     renderAllClients(filtered);
 }
 
-function toggleClientTask(id, owner) {
-    if (currentMember !== owner) {
-        alert(`Verification required: Log in as ${owner} to update this assignment.`);
-        return;
-    }
-    if (completedTasks.has(id)) completedTasks.delete(id);
-    else completedTasks.add(id);
-    
-    renderAllClients();
-    renderKPIs();
-    initCharts(); // Update charts on change
-}
-
-function saveProgress() {
-    const toast = document.getElementById('save-status');
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
-}
-
-// --- Auth Handling ---
-function openPasswordModal(name) {
-    window.targetMember = name;
-    document.getElementById('modal-user-name').textContent = name;
-    document.getElementById('password-modal').classList.add('active');
-}
-
-function checkPassword() {
-    const pwd = document.getElementById('secret-password').value;
-    if (pwd === memberPasswords[window.targetMember]) {
-        currentMember = window.targetMember;
-        closeModal();
-        updateUIForAuth();
-        renderAllClients();
-    } else {
-        alert('Invalid Password');
-    }
-}
-
-function updateUIForAuth() {
-    const display = document.getElementById('user-display-short');
-    const avatar = document.getElementById('user-avatar-tiny');
-    const saveBtn = document.getElementById('save-btn');
-
-    if (currentMember) {
-        display.textContent = currentMember;
-        avatar.textContent = currentMember[0];
-        saveBtn.style.display = 'flex';
-    } else {
-        display.textContent = 'Guest';
-        avatar.textContent = 'G';
-        saveBtn.style.display = 'none';
-    }
-}
-
-function switchScreen(id) {
-    if (id === 'dashboard') {
-        const names = ['Agney', 'Neha', 'Nived', 'Sijin', 'Dilna'];
-        const listContainer = document.querySelector('#details .member-list');
-        // Simple team selector logic for demo
-        showTeam('graphic-design');
-    }
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-}
-
-function showTeam(key) {
-    // Re-use previous team definitions
-    const members = {
-        'graphic-design': ['Agney', 'Neha', 'Nived'],
-        'video-production': ['Sijin', 'Shawn', 'Hari']
-    }[key] || ['Team Member'];
-    
-    document.getElementById('team-title').textContent = key.replace('-', ' ').toUpperCase();
-    const list = document.getElementById('member-list');
-    list.innerHTML = members.map(m => `
-        <div class="member-card" onclick="openPasswordModal('${m}')">
-            <div class="avatar-circle">${m[0]}</div>
-            <span>${m}</span>
-        </div>
-    `).join('');
-    switchScreen('details');
-}
-
-function closeModal() { document.getElementById('password-modal').classList.remove('active'); }
+document.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && document.getElementById('password-modal').classList.contains('active')) checkPassword();
+});
 
 init();

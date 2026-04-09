@@ -1,21 +1,9 @@
 // --- Team & Auth Data ---
 const teams = {
-    'graphic-design': {
-        title: 'Graphic Designers',
-        members: ['Agney', 'Neha', 'Nived']
-    },
-    'video-production': {
-        title: 'Video Editors',
-        members: ['Sijin', 'Abhay', 'Adhil', 'Shaun', 'Hari']
-    },
-    'social-media': {
-        title: 'Social Media Managers',
-        members: ['Megha', 'Christi']
-    },
-    'content-writing': {
-        title: 'Content Writers',
-        members: ['Dilna']
-    }
+    'graphic-design': { title: 'Graphic Designers', members: ['Agney', 'Neha', 'Nived'] },
+    'video-production': { title: 'Video Editors', members: ['Sijin', 'Abhay', 'Adhil', 'Shaun', 'Hari'] },
+    'social-media': { title: 'Social Media Managers', members: ['Megha', 'Christi'] },
+    'content-writing': { title: 'Content Writers', members: ['Dilna'] }
 };
 
 const memberPasswords = {
@@ -40,6 +28,7 @@ const allClients = [
     { id: 'cli12', name: 'Santa Ma', cycle: '—', posts: 6, videos: 0, status: 'progress', owner: 'Agney' }
 ];
 
+let selectedRoleKey = null;
 let currentMember = null;
 let completedTasks = new Set();
 let progressChart = null;
@@ -51,6 +40,71 @@ function init() {
     renderAllClients();
     initCharts();
 }
+
+// --- Step 1: Role Selection Logic ---
+
+function selectRole(key) {
+    selectedRoleKey = key;
+    
+    // UI Update: Highlight card
+    document.querySelectorAll('.role-card').forEach(card => card.classList.remove('selected'));
+    document.getElementById(`role-${key}`).classList.add('selected');
+    
+    // Enable Continue button
+    const btn = document.getElementById('continue-btn');
+    btn.classList.remove('disabled');
+    
+    // Subtle Haptic/Audio Feedback would go here
+    console.log("Selected Role:", key);
+}
+
+function proceedToNames() {
+    if (!selectedRoleKey) return;
+    showTeam(selectedRoleKey);
+}
+
+// --- Step 2: Member Selection Logic ---
+
+function showTeam(teamKey) {
+    const team = teams[teamKey];
+    document.getElementById('team-title').textContent = team.title;
+    document.getElementById('member-count').textContent = `Select your name among ${team.members.length} members`;
+
+    const list = document.getElementById('member-list');
+    list.innerHTML = team.members.map(name => `
+        <div class="member-card anim-slide-in" onclick="openPasswordModal('${name}')">
+            <div class="avatar-circle">${name[0]}</div>
+            <div class="member-name">${name}</div>
+        </div>
+    `).join('');
+
+    switchScreen('details');
+}
+
+function openPasswordModal(name) {
+    window.targetMember = name;
+    document.getElementById('modal-user-name').textContent = name;
+    document.getElementById('password-modal').classList.add('active');
+    document.getElementById('secret-password').value = '';
+    setTimeout(() => document.getElementById('secret-password').focus(), 100);
+}
+
+function checkPassword() {
+    const pwd = document.getElementById('secret-password').value;
+    if (pwd === memberPasswords[window.targetMember]) {
+        currentMember = window.targetMember;
+        closeModal();
+        updateUIForAuth();
+        switchScreen('client-board');
+        renderAllClients();
+        renderKPIs();
+        initCharts();
+    } else {
+        document.getElementById('password-error').style.display = 'block';
+    }
+}
+
+// --- Step 3: Dashboard Operations ---
 
 function renderKPIs() {
     const total = allClients.length;
@@ -73,7 +127,6 @@ function renderAllClients(filteredList = allClients) {
         const isOwner = currentMember === client.owner;
         const isDone = client.status === 'completed' || completedTasks.has(client.id);
         const progress = isDone ? 100 : (client.status === 'delayed' ? 30 : 65);
-        const initials = client.owner[0].toUpperCase();
 
         const card = document.createElement('div');
         card.className = 'client-card';
@@ -89,31 +142,18 @@ function renderAllClients(filteredList = allClients) {
                     ${isDone ? 'COMPLETED' : client.status.toUpperCase()}
                 </div>
             </div>
-
             <div class="card-stats">
                 <div class="stat-item"><i class="ph ph-image"></i> ${client.posts} Posts</div>
                 <div class="stat-item"><i class="ph ph-video"></i> ${client.videos} Videos</div>
             </div>
-
             <div class="card-progress">
-                <div class="progress-meta">
-                    <span>Progress</span>
-                    <span>${progress}%</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${progress}%"></div>
-                </div>
+                <div class="progress-meta"><span>Progress</span><span>${progress}%</span></div>
+                <div class="progress-bar"><div class="progress-fill" style="width: ${progress}%"></div></div>
             </div>
-
             <div class="card-footer">
-                <div class="owner-info">
-                    <div class="avatar-sm">${initials}</div>
-                    <span>${client.owner}</span>
-                </div>
-                <div class="done-pill ${isDone ? 'active' : ''} ${!isOwner ? 'disabled' : ''}" 
-                     onclick="toggleClientTask('${client.id}', '${client.owner}')">
-                    <i class="ph ${isDone ? 'ph-check-circle-fill' : 'ph-circle'}"></i>
-                    <span>${isDone ? 'Done' : 'Mark Done'}</span>
+                <div class="owner-info"><div class="avatar-sm">${client.owner[0]}</div><span>${client.owner}</span></div>
+                <div class="done-pill ${isDone ? 'active' : ''} ${!isOwner ? 'disabled' : ''}" onclick="toggleClientTask('${client.id}', '${client.owner}')">
+                    <i class="ph ${isDone ? 'ph-check-circle-fill' : 'ph-circle'}"></i><span>${isDone ? 'Done' : 'Mark Done'}</span>
                 </div>
             </div>
             ${isOwner ? '<div style="position:absolute; top: 0; right: 0; background: var(--primary); color: white; padding: 2px 8px; font-size: 0.6rem; font-weight: 700; border-radius: 0 0 0 8px;">YOU</div>' : ''}
@@ -122,10 +162,10 @@ function renderAllClients(filteredList = allClients) {
     });
 }
 
-// --- Charts Logic ---
 function initCharts() {
-    const ctxProgress = document.getElementById('progressChart').getContext('2d');
-    const ctxSplit = document.getElementById('contentSplitChart').getContext('2d');
+    const ctxProgress = document.getElementById('progressChart')?.getContext('2d');
+    const ctxSplit = document.getElementById('contentSplitChart')?.getContext('2d');
+    if (!ctxProgress || !ctxSplit) return;
 
     if (progressChart) progressChart.destroy();
     if (contentSplitChart) contentSplitChart.destroy();
@@ -134,92 +174,34 @@ function initCharts() {
         type: 'bar',
         data: {
             labels: allClients.map(c => c.name),
-            datasets: [{
-                label: 'Status',
-                data: allClients.map(c => (completedTasks.has(c.id) || c.status === 'completed') ? 100 : 60),
-                backgroundColor: '#f97316',
-                borderRadius: 4
-            }]
+            datasets: [{ label: 'Status', data: allClients.map(c => (completedTasks.has(c.id) || c.status === 'completed') ? 100 : 60), backgroundColor: '#f97316', borderRadius: 4 }]
         },
-        options: {
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true, max: 100 } }
-        }
+        options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100 } } }
     });
-
-    const totalPosts = allClients.reduce((acc, c) => acc + c.posts, 0);
-    const totalVideos = allClients.reduce((acc, c) => acc + c.videos, 0);
 
     contentSplitChart = new Chart(ctxSplit, {
         type: 'doughnut',
         data: {
             labels: ['Posts', 'Videos'],
-            datasets: [{
-                data: [totalPosts, totalVideos],
-                backgroundColor: ['#f97316', '#3b82f6'],
-                borderWidth: 0
-            }]
+            datasets: [{ data: [allClients.reduce((acc, c) => acc + c.posts, 0), allClients.reduce((acc, c) => acc + c.videos, 0)], backgroundColor: ['#f97316', '#3b82f6'], borderWidth: 0 }]
         },
-        options: {
-            maintainAspectRatio: false,
-            cutout: '70%',
-            plugins: { legend: { position: 'bottom' } }
-        }
+        options: { maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom' } } }
     });
 }
 
-// --- Navigation Logic (Step-by-Step) ---
-
-function showTeam(teamKey) {
-    const team = teams[teamKey];
-    document.getElementById('team-title').textContent = team.title;
-    document.getElementById('member-count').textContent = `Select your name among ${team.members.length} members`;
-
-    const list = document.getElementById('member-list');
-    list.innerHTML = team.members.map(name => `
-        <div class="member-card" onclick="openPasswordModal('${name}')">
-            <div class="avatar-circle">${name[0]}</div>
-            <div class="member-name">${name}</div>
-        </div>
-    `).join('');
-
-    switchScreen('details');
-}
-
-function openPasswordModal(name) {
-    window.targetMember = name;
-    document.getElementById('modal-user-name').textContent = name;
-    document.getElementById('password-modal').classList.add('active');
-    document.getElementById('secret-password').value = '';
-    setTimeout(() => document.getElementById('secret-password').focus(), 100);
-}
-
-function checkPassword() {
-    const pwd = document.getElementById('secret-password').value;
-    const name = window.targetMember;
-    if (pwd === memberPasswords[name]) {
-        currentMember = name;
-        closeModal();
-        updateUIForAuth();
-        switchScreen('client-board');
-        renderAllClients();
-        renderKPIs();
-        initCharts();
-    } else {
-        document.getElementById('password-error').style.display = 'block';
-    }
-}
+// --- Shared Utilities ---
 
 function updateUIForAuth() {
     if (currentMember) {
         document.getElementById('user-display-short').textContent = currentMember;
-        document.getElementById('user-avatar-tiny').textContent = currentMember[0];
     }
 }
 
 function logout() {
     currentMember = null;
+    selectedRoleKey = null;
+    document.querySelectorAll('.role-card').forEach(card => card.classList.remove('selected'));
+    document.getElementById('continue-btn').classList.add('disabled');
     switchScreen('dashboard');
 }
 
@@ -232,10 +214,7 @@ function switchScreen(id) {
 function closeModal() { document.getElementById('password-modal').classList.remove('active'); }
 
 function toggleClientTask(id, owner) {
-    if (currentMember !== owner) {
-        alert(`Access Denied: Only ${owner} can update this client.`);
-        return;
-    }
+    if (currentMember !== owner) return;
     if (completedTasks.has(id)) completedTasks.delete(id);
     else completedTasks.add(id);
     renderAllClients();
@@ -258,18 +237,10 @@ function filterClients() {
         const matchesSearch = c.name.toLowerCase().includes(searchTerm);
         const matchesOwner = owner === 'all' || c.owner === owner;
         const isDone = c.status === 'completed' || completedTasks.has(c.id);
-        const matchesStatus = status === 'all' || 
-                              (status === 'completed' && isDone) || 
-                              (status === 'pending' && !isDone);
-        
+        const matchesStatus = status === 'all' || (status === 'completed' && isDone) || (status === 'pending' && !isDone);
         return matchesSearch && matchesOwner && matchesStatus;
     });
-
     renderAllClients(filtered);
 }
-
-document.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter' && document.getElementById('password-modal').classList.contains('active')) checkPassword();
-});
 
 init();

@@ -105,32 +105,120 @@ body {
 
 .icon-btn:hover { background: #f8fafc; transform: translateY(-2px); }
 
-.user-profile-pill {
-    background: white;
-    border: 1px solid #e2e8f0;
-    padding: 0.4rem 0.4rem 0.4rem 1rem;
-    border-radius: 99px;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    cursor: pointer;
-    transition: all 0.2s;
+/* Step 1: Role Selection UI */
+.role-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    max-width: 800px;
+    margin: 2rem auto;
 }
 
-.user-profile-pill:hover { border-color: var(--primary); }
+.role-card {
+    background: white;
+    border: 2px solid transparent;
+    padding: 2rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+}
 
-.avatar-sm {
-    width: 32px;
-    height: 32px;
-    background: var(--primary);
-    color: white;
-    border-radius: 50%;
+.role-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05);
+    border-color: rgba(249, 115, 22, 0.2);
+}
+
+.role-card.selected {
+    border-color: var(--primary);
+    background: var(--primary-light);
+}
+
+.role-card.selected .selection-indicator {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.selection-indicator {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    color: var(--primary);
+    font-size: 1.5rem;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.role-icon-box {
+    width: 64px;
+    height: 64px;
+    background: #f8fafc;
+    border-radius: 16px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-weight: 700;
-    font-size: 0.75rem;
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    transition: transform 0.3s;
 }
+
+.role-card:hover .role-icon-box {
+    transform: rotate(5deg);
+    background: white;
+}
+
+.role-info h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem; }
+.role-info p { color: var(--text-muted); font-size: 0.9rem; font-weight: 500; }
+
+/* Continue Button */
+.cta-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 3rem;
+}
+
+.btn-continue {
+    padding: 1.25rem 3.5rem;
+    background: linear-gradient(135deg, #f97316, #fcd34d); /* Orange to soft gold */
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 10px 15px -3px rgba(249, 115, 22, 0.3);
+    transition: all 0.3s;
+}
+
+.btn-continue.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    filter: grayscale(0.8);
+    transform: scale(0.98);
+}
+
+.btn-continue:not(.disabled):hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(249, 115, 22, 0.4);
+}
+
+@media (max-width: 768px) {
+    .role-selection-grid { grid-template-columns: 1fr; padding: 0 1rem; }
+}
+
+/* Rest of the styles... */
 
 /* KPI Row */
 .kpi-row {

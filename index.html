@@ -25,35 +25,45 @@
                 <p>Choose your professional role within Cntrl M</p>
             </header>
 
-            <div class="card-grid">
-                <div class="card" onclick="showTeam('graphic-design')">
-                    <div class="icon-box orange"><i class="ph ph-paint-brush"></i></div>
-                    <div class="card-info">
+            <div class="role-selection-grid">
+                <div class="role-card" id="role-graphic-design" onclick="selectRole('graphic-design')">
+                    <div class="selection-indicator"><i class="ph ph-check-circle-fill"></i></div>
+                    <div class="role-icon-box"><i class="ph ph-paint-brush-duotone"></i></div>
+                    <div class="role-info">
                         <h3>Graphic Designer</h3>
                         <p>Visual Arts & Branding</p>
                     </div>
                 </div>
-                <div class="card" onclick="showTeam('video-production')">
-                    <div class="icon-box orange"><i class="ph ph-video"></i></div>
-                    <div class="card-info">
+                <div class="role-card" id="role-video-production" onclick="selectRole('video-production')">
+                    <div class="selection-indicator"><i class="ph ph-check-circle-fill"></i></div>
+                    <div class="role-icon-box"><i class="ph ph-video-camera-duotone"></i></div>
+                    <div class="role-info">
                         <h3>Video Editor</h3>
                         <p>Post-Production & Motion</p>
                     </div>
                 </div>
-                <div class="card" onclick="showTeam('social-media')">
-                    <div class="icon-box orange"><i class="ph ph-instagram-logo"></i></div>
-                    <div class="card-info">
+                <div class="role-card" id="role-social-media" onclick="selectRole('social-media')">
+                    <div class="selection-indicator"><i class="ph ph-check-circle-fill"></i></div>
+                    <div class="role-icon-box"><i class="ph ph-instagram-logo-duotone"></i></div>
+                    <div class="role-info">
                         <h3>Social Media</h3>
                         <p>Management & Strategy</p>
                     </div>
                 </div>
-                <div class="card" onclick="showTeam('content-writing')">
-                    <div class="icon-box orange"><i class="ph ph-text-aa"></i></div>
-                    <div class="card-info">
+                <div class="role-card" id="role-content-writing" onclick="selectRole('content-writing')">
+                    <div class="selection-indicator"><i class="ph ph-check-circle-fill"></i></div>
+                    <div class="role-icon-box"><i class="ph ph-text-aa-duotone"></i></div>
+                    <div class="role-info">
                         <h3>Content Writer</h3>
                         <p>Copywriting & Narratives</p>
                     </div>
                 </div>
+            </div>
+
+            <div class="cta-wrapper">
+                <button id="continue-btn" class="btn-continue disabled" onclick="proceedToNames()">
+                    Continue <i class="ph ph-arrow-right"></i>
+                </button>
             </div>
         </main>
 

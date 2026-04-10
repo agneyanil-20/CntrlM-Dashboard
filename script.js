@@ -1,31 +1,46 @@
 // --- Data & State Management ---
 
-// Default Initial Data with Start Dates and History
+// Default Initial Data with Specific Video Production Mappings
 const defaultClients = [
-    { id: 'cli1', name: 'Nails', cycle: '19–19', posts: 6, videos: 0, status: 'progress', owner: 'Neha', startDate: '2026-03-25', links: [], history: [{ month: 'Feb', posts: 4, videos: 0, result: 'Success' }] },
-    { id: 'cli2', name: 'Pantry', cycle: '12–12', posts: 9, videos: 0, status: 'completed', owner: 'Neha', startDate: '2026-03-10', links: [], history: [] },
-    { id: 'cli3', name: 'Tredha', cycle: '19–19', posts: 15, videos: 0, status: 'progress', owner: 'Agney', startDate: '2026-03-20', links: [], history: [] },
-    { id: 'cli4', name: 'Fabaich', cycle: '17–17', posts: 6, videos: 1, status: 'progress', owner: 'Nived', startDate: '2026-03-15', links: [], history: [] },
-    { id: 'cli5', name: 'Techolas', cycle: '12–12', posts: 4, videos: 0, status: 'completed', owner: 'Nived', startDate: '2026-03-05', links: [], history: [] },
-    { id: 'cli6', name: 'Flev', cycle: '19–19', posts: 10, videos: 3, status: 'delayed', owner: 'Agney', startDate: '2026-03-28', links: [], history: [] }
+    { id: 'cli1', name: 'Speeki English', cycle: '19–19', posts: 6, videos: 0, status: 'progress', owner: 'Shaun', startDate: '2026-03-25', links: [], history: [] },
+    { id: 'cli2', name: 'Speeki German', cycle: '12–12', posts: 9, videos: 0, status: 'completed', owner: 'Shaun', startDate: '2026-03-10', links: [], history: [] },
+    { id: 'cli3', name: 'Stray Dogs AI', cycle: '19–19', posts: 15, videos: 0, status: 'progress', owner: 'Adhil', startDate: '2026-03-20', links: [], history: [] },
+    { id: 'cli4', name: 'Fabrich', cycle: '17–17', posts: 6, videos: 1, status: 'progress', owner: 'Adhil', startDate: '2026-03-15', links: [], history: [] },
+    { id: 'cli5', name: 'Techolas', cycle: '12–12', posts: 4, videos: 0, status: 'completed', owner: 'Abhay', startDate: '2026-03-05', links: [], history: [] },
+    { id: 'cli6', name: 'Nails by Rita', cycle: '19–19', posts: 10, videos: 3, status: 'delayed', owner: 'Abhay', startDate: '2026-03-28', links: [], history: [] },
+    { id: 'cli7', name: 'Santa Maria', cycle: '—', posts: 0, videos: 0, status: 'progress', owner: 'Hari', startDate: '2026-03-12', links: [], history: [] },
+    { id: 'cli8', name: 'Soly Denim', cycle: '—', posts: 6, videos: 0, status: 'progress', owner: 'Hari', startDate: '2026-03-18', links: [], history: [] },
+    { id: 'cli9', name: 'Matti', cycle: '—', posts: 3, videos: 0, status: 'completed', owner: 'SIJIN', startDate: '2026-03-22', links: [], history: [] },
+    { id: 'cli10', name: 'Zoholand', cycle: '—', posts: 6, videos: 0, status: 'delayed', owner: 'SIJIN', startDate: '2026-03-26', links: [], history: [] },
+    { id: 'cli11', name: 'Tredha', cycle: '19–19', posts: 12, videos: 0, status: 'progress', owner: 'Agney', startDate: '2026-03-20', links: [], history: [] },
+    { id: 'cli12', name: 'Pantry', cycle: '12–12', posts: 8, videos: 0, status: 'progress', owner: 'Neha', startDate: '2026-03-25', links: [], history: [] }
 ];
 
 const memberPasswords = {
     'Agney': 'agney123', 'Neha': 'neha123', 'Nived': 'nived123',
-    'Sijin': 'sijin123', 'Abhay': 'abhay123', 'Adhil': 'adil123',
+    'SIJIN': 'sijin123', 'Abhay': 'abhay123', 'Adhil': 'adil123',
     'Shaun': 'shawn123', 'Hari': 'hari123', 'Megha': 'megha123',
     'Christi': 'christi123', 'Dilna': 'mango123', 'admin': 'admin123'
 };
 
 const teams = {
     'graphic-design': { title: 'Graphic Designers', members: ['Agney', 'Neha', 'Nived'] },
-    'video-production': { title: 'Video Editors', members: ['Sijin', 'Abhay', 'Adhil', 'Shaun', 'Hari'] },
+    'video-production': { title: 'Video Editors', members: ['SIJIN', 'Abhay', 'Adhil', 'Shaun', 'Hari'] },
     'social-media': { title: 'Social Media Managers', members: ['Megha', 'Christi'] },
     'content-writing': { title: 'Content Writers', members: ['Dilna'] }
 };
 
 let allClients = JSON.parse(localStorage.getItem('cntrlm_clients')) || defaultClients;
 let completedTasks = new Set(JSON.parse(localStorage.getItem('cntrlm_completed')) || []);
+
+// IMPORTANT: Overwrite with new mapping if user just provided it
+// This ensures the new mapping takes effect even if localStorage has old data
+const forceNewMapping = true; 
+if (forceNewMapping && !localStorage.getItem('mapping_updated_v2')) {
+    allClients = defaultClients;
+    localStorage.setItem('cntrlm_clients', JSON.stringify(allClients));
+    localStorage.setItem('mapping_updated_v2', 'true');
+}
 
 let selectedRoleKey = null;
 let currentMember = null;
@@ -167,7 +182,7 @@ function openClientReport(clientId) {
     currentReportClientId = clientId;
     const client = allClients.find(c => c.id === clientId);
     const isDone = client.status === 'completed' || completedTasks.has(client.id);
-    const progress = isDone ? 100 : 65;
+    const progress = isDone ? 100 : 70;
     const days = getDaysRemaining(client.startDate);
 
     document.getElementById('report-client-name').textContent = client.name;
@@ -198,12 +213,7 @@ function renderReportLinks(client) {
 function renderReportHistory(client) {
     const list = document.getElementById('report-history-list');
     list.innerHTML = client.history && client.history.length > 0 ? client.history.map(row => `
-        <tr>
-            <td>${row.month}</td>
-            <td>${row.posts}</td>
-            <td>${row.videos}</td>
-            <td><span class="status-badge status-completed">${row.result}</span></td>
-        </tr>
+        <tr><td>${row.month}</td><td>${row.posts}</td><td>${row.videos}</td><td><span class="status-badge status-completed">${row.result}</span></td></tr>
     `).join('') : '<tr><td colspan="4" style="text-align:center; padding:2rem; color:var(--text-muted);">No history data found.</td></tr>';
 }
 
@@ -240,7 +250,7 @@ function renderAdminList() {
     `).join('');
 }
 
-// --- Filtering & View Toggles (Same as before but integrated) ---
+// --- Filtering & View Toggles ---
 function getFilteredList() {
     const searchTerm = document.getElementById('clientSearch')?.value.toLowerCase() || '';
     return allClients.filter(c => {
@@ -268,7 +278,7 @@ function initCharts() {
         type: 'bar',
         data: {
             labels: allClients.map(c => c.name),
-            datasets: [{ label: 'Status', data: allClients.map(c => (completedTasks.has(c.id) || c.status === 'completed') ? 100 : 60), backgroundColor: '#f97316', borderRadius: 8 }]
+            datasets: [{ label: 'Status', data: allClients.map(c => (completedTasks.has(c.id) || c.status === 'completed') ? 100 : 70), backgroundColor: '#f97316', borderRadius: 8 }]
         },
         options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });

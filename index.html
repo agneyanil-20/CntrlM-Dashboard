@@ -58,6 +58,14 @@
                         <p>Copywriting & Narratives</p>
                     </div>
                 </div>
+                <div class="role-card admin-special" id="role-admin" onclick="selectRole('admin')">
+                    <div class="selection-indicator"><i class="ph ph-check-circle-fill"></i></div>
+                    <div class="role-icon-box"><i class="ph ph-lock-key-duotone"></i></div>
+                    <div class="role-info">
+                        <h3>Admin Panel</h3>
+                        <p>Management & Controls</p>
+                    </div>
+                </div>
             </div>
 
             <div class="cta-wrapper">
@@ -67,7 +75,7 @@
             </div>
         </main>
 
-        <!-- Global Client Board Screen -->
+        <!-- Global Client Board Screen (Step 3) -->
         <main id="client-board" class="screen">
             <header class="header">
                 <div>
@@ -76,10 +84,14 @@
                 </div>
                 <div class="header-actions">
                     <div id="save-status" class="save-toast">Status updated</div>
+                    <div class="view-toggles">
+                        <button class="toggle-btn active" id="grid-view-btn" onclick="setView('grid')"><i class="ph ph-squares-four"></i></button>
+                        <button class="toggle-btn" id="list-view-btn" onclick="setView('list')"><i class="ph ph-list"></i></button>
+                    </div>
                     <div class="user-profile-pill">
                         <span id="user-display-short">Member</span>
                         <div class="avatar-sm" id="user-avatar-tiny">M</div>
-                        <button class="logout-btn" onclick="logout()" style="margin-left: 0.5rem; background: none; border: none; font-size: 0.75rem; color: var(--primary); cursor: pointer; font-weight: 600;">Logout</button>
+                        <button class="logout-btn" onclick="logout()">Logout</button>
                     </div>
                     <button id="save-btn" class="btn-primary glow" onclick="saveProgress()">
                         <i class="ph ph-sparkle"></i> Save Today
@@ -92,17 +104,17 @@
                 <div class="kpi-card glass">
                     <div class="kpi-header">
                         <div class="kpi-icon blue"><i class="ph ph-clipboard-text"></i></div>
-                        <span class="trend up">↑ 12%</span>
+                        <span class="trend up">Total</span>
                     </div>
                     <div class="kpi-body">
                         <h4 id="kpi-total">0</h4>
-                        <p>Total Deliverables</p>
+                        <p>Deliverables</p>
                     </div>
                 </div>
                 <div class="kpi-card glass">
                     <div class="kpi-header">
                         <div class="kpi-icon green"><i class="ph ph-check-circle"></i></div>
-                        <span class="trend up">↑ 8%</span>
+                        <span class="trend up">Done</span>
                     </div>
                     <div class="kpi-body">
                         <h4 id="kpi-completed">0</h4>
@@ -112,21 +124,11 @@
                 <div class="kpi-card glass">
                     <div class="kpi-header">
                         <div class="kpi-icon yellow"><i class="ph ph-clock-countdown"></i></div>
-                        <span class="trend down">↓ 2%</span>
+                        <span class="trend down">Active</span>
                     </div>
                     <div class="kpi-body">
                         <h4 id="kpi-pending">0</h4>
                         <p>Pending</p>
-                    </div>
-                </div>
-                <div class="kpi-card glass">
-                    <div class="kpi-header">
-                        <div class="kpi-icon red"><i class="ph ph-warning-circle"></i></div>
-                        <span class="trend">Static</span>
-                    </div>
-                    <div class="kpi-body">
-                        <h4 id="kpi-delayed">0</h4>
-                        <p>Delayed</p>
                     </div>
                 </div>
             </section>
@@ -136,41 +138,150 @@
                 <div class="chart-container glass main-chart">
                     <div class="chart-header">
                         <h3>Deliverables Progress</h3>
-                        <p>Completion per client</p>
+                        <p>Completion vs Remaining per client</p>
                     </div>
-                    <canvas id="progressChart"></canvas>
+                    <div class="chart-wrapper">
+                        <canvas id="progressChart"></canvas>
+                    </div>
                 </div>
                 <div class="chart-container glass side-chart">
                     <div class="chart-header">
                         <h3>Content Split</h3>
-                        <p>By type</p>
+                        <p>Distribution by type</p>
                     </div>
-                    <canvas id="contentSplitChart"></canvas>
+                    <div class="chart-wrapper donut-wrapper">
+                        <canvas id="contentSplitChart"></canvas>
+                        <div class="donut-center">
+                            <span id="donut-total">0</span>
+                            <small>Total</small>
+                        </div>
+                    </div>
                 </div>
             </section>
             
-            <!-- Controls & Filters -->
-            <section class="controls-bar">
-                <div class="search-box glass">
+            <!-- Controls & Filter Chips -->
+            <section class="controls-row">
+                <div class="search-bar glass">
                     <i class="ph ph-magnifying-glass"></i>
-                    <input type="text" id="clientSearch" placeholder="Search client..." oninput="filterClients()">
+                    <input type="text" id="clientSearch" placeholder="Search clients..." oninput="filterClients()">
                 </div>
-                <div class="filter-group">
-                    <select id="ownerFilter" class="glass" onchange="filterClients()">
-                        <option value="all">All Owners</option>
-                        <option value="Agney">Agney</option>
-                        <option value="Neha">Neha</option>
-                        <option value="Nived">Nived</option>
-                    </select>
-                    <select id="statusFilter" class="glass" onchange="filterClients()">
-                        <option value="all">Every Status</option>
-                        <option value="completed">Completed</option>
-                        <option value="pending">Remaining</option>
-                    </select>
+                <div class="filter-chips">
+                    <div class="chip-group">
+                        <span class="chip-label">Owner:</span>
+                        <div class="chips" id="owner-chips">
+                            <span class="chip active" onclick="setChipFilter('owner', 'all')">All</span>
+                            <span class="chip" onclick="setChipFilter('owner', 'Agney')">Agney</span>
+                            <span class="chip" onclick="setChipFilter('owner', 'Neha')">Neha</span>
+                            <span class="chip" onclick="setChipFilter('owner', 'Nived')">Nived</span>
+                        </div>
+                    </div>
+                    <div class="chip-group">
+                        <span class="chip-label">Status:</span>
+                        <div class="chips" id="status-chips">
+                            <span class="chip active" onclick="setChipFilter('status', 'all')">All</span>
+                            <span class="chip" onclick="setChipFilter('status', 'completed')">Completed</span>
+                            <span class="chip" onclick="setChipFilter('status', 'pending')">In Progress</span>
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            <div class="clients-feed" id="all-clients-grid"></div>
+            <div class="clients-feed grid-view" id="all-clients-grid"></div>
+        </main>
+
+        <!-- Client Full Report Screen -->
+        <main id="client-report" class="screen">
+            <header class="header">
+                <button class="back-link" onclick="switchScreen('client-board')">
+                    <i class="ph ph-arrow-left"></i> Back to Board
+                </button>
+                <div class="report-header-main">
+                    <h1 id="report-client-name">Client Name</h1>
+                    <div id="report-status-badge" class="status-badge">Completed</div>
+                </div>
+            </header>
+
+            <div class="report-grid">
+                <!-- Main Stats -->
+                <div class="report-card glass stats-overview">
+                    <h3>Current Cycle Progress</h3>
+                    <div class="report-stats-row">
+                        <div class="stat-big">
+                            <span id="report-days-left">0</span>
+                            <small>Days Left</small>
+                        </div>
+                        <div class="stat-big">
+                            <span id="report-progress-pct">0%</span>
+                            <small>Complete</small>
+                        </div>
+                    </div>
+                    <div class="progress-bar-large"><div id="report-progress-fill" class="progress-fill"></div></div>
+                </div>
+
+                <!-- Link Management -->
+                <div class="report-card glass link-management">
+                    <div class="card-header-flex">
+                        <h3>Saved Links & Proofs</h3>
+                        <button class="btn-sm" onclick="promptAddLink()"><i class="ph ph-plus"></i> Add Link</button>
+                    </div>
+                    <div class="link-list" id="report-link-list">
+                        <!-- Links injected here -->
+                    </div>
+                </div>
+
+                <!-- Past Month Performance -->
+                <div class="report-card glass history-section">
+                    <h3>Performance History</h3>
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Posts</th>
+                                <th>Videos</th>
+                                <th>Result</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-history-list">
+                            <!-- History items injected here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- Admin Panel Screen -->
+        <main id="admin-panel" class="screen">
+            <header class="header">
+                <div>
+                    <h1>Admin Console</h1>
+                    <p>System-wide client data management</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-primary" onclick="openAdminModal()">
+                        <i class="ph ph-plus-circle"></i> Add New Client
+                    </button>
+                    <button class="btn-sm outline" onclick="logout()">Logout</button>
+                </div>
+            </header>
+
+            <div class="admin-table-container glass">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Client Name</th>
+                            <th>Cycle</th>
+                            <th>Deliverables</th>
+                            <th>Owner</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-client-list">
+                        <!-- Admin list items injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
         </main>
 
         <!-- Team Details Screen (Step 2: Names) -->
@@ -189,6 +300,61 @@
                 <!-- Member names injected here -->
             </div>
         </main>
+
+        <!-- Admin Edit/Add Modal -->
+        <div id="admin-modal" class="modal">
+            <div class="modal-content glass admin-modal-wide">
+                <div class="modal-header">
+                    <h3 id="admin-modal-title">Edit Client Details</h3>
+                    <p>Update system-wide data records</p>
+                </div>
+                <div class="modal-body admin-form">
+                    <input type="hidden" id="edit-client-id">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label>Client Name</label>
+                            <input type="text" id="edit-name" placeholder="Name">
+                        </div>
+                        <div class="input-group">
+                            <label>Date Cycle</label>
+                            <input type="text" id="edit-cycle" placeholder="e.g. 19-19">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label>Post Count</label>
+                            <input type="number" id="edit-posts">
+                        </div>
+                        <div class="input-group">
+                            <label>Video Count</label>
+                            <input type="number" id="edit-videos">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label>Assigned Owner</label>
+                            <select id="edit-owner">
+                                <option value="Agney">Agney</option>
+                                <option value="Neha">Neha</option>
+                                <option value="Nived">Nived</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>System Status</label>
+                            <select id="edit-status">
+                                <option value="pending">In Progress</option>
+                                <option value="completed">Completed</option>
+                                <option value="delayed">Delayed</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-sm outline" onclick="closeAdminModal()">Cancel</button>
+                    <button class="btn-primary" onclick="saveAdminData()">Save System Data</button>
+                </div>
+            </div>
+        </div>
 
         <!-- Password Prompt Modal -->
         <div id="password-modal" class="modal">

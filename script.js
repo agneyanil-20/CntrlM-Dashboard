@@ -1,4 +1,22 @@
-// --- Team & Auth Data ---
+// --- Data & State Management ---
+
+// Default Initial Data with Start Dates and History
+const defaultClients = [
+    { id: 'cli1', name: 'Nails', cycle: '19–19', posts: 6, videos: 0, status: 'progress', owner: 'Neha', startDate: '2026-03-25', links: [], history: [{ month: 'Feb', posts: 4, videos: 0, result: 'Success' }] },
+    { id: 'cli2', name: 'Pantry', cycle: '12–12', posts: 9, videos: 0, status: 'completed', owner: 'Neha', startDate: '2026-03-10', links: [], history: [] },
+    { id: 'cli3', name: 'Tredha', cycle: '19–19', posts: 15, videos: 0, status: 'progress', owner: 'Agney', startDate: '2026-03-20', links: [], history: [] },
+    { id: 'cli4', name: 'Fabaich', cycle: '17–17', posts: 6, videos: 1, status: 'progress', owner: 'Nived', startDate: '2026-03-15', links: [], history: [] },
+    { id: 'cli5', name: 'Techolas', cycle: '12–12', posts: 4, videos: 0, status: 'completed', owner: 'Nived', startDate: '2026-03-05', links: [], history: [] },
+    { id: 'cli6', name: 'Flev', cycle: '19–19', posts: 10, videos: 3, status: 'delayed', owner: 'Agney', startDate: '2026-03-28', links: [], history: [] }
+];
+
+const memberPasswords = {
+    'Agney': 'agney123', 'Neha': 'neha123', 'Nived': 'nived123',
+    'Sijin': 'sijin123', 'Abhay': 'abhay123', 'Adhil': 'adil123',
+    'Shaun': 'shawn123', 'Hari': 'hari123', 'Megha': 'megha123',
+    'Christi': 'christi123', 'Dilna': 'mango123', 'admin': 'admin123'
+};
+
 const teams = {
     'graphic-design': { title: 'Graphic Designers', members: ['Agney', 'Neha', 'Nived'] },
     'video-production': { title: 'Video Editors', members: ['Sijin', 'Abhay', 'Adhil', 'Shaun', 'Hari'] },
@@ -6,33 +24,15 @@ const teams = {
     'content-writing': { title: 'Content Writers', members: ['Dilna'] }
 };
 
-const memberPasswords = {
-    'Agney': 'agney123', 'Neha': 'neha123', 'Nived': 'nived123',
-    'Sijin': 'sijin123', 'Abhay': 'abhay123', 'Adhil': 'adil123',
-    'Shaun': 'shawn123', 'Hari': 'hari123', 'Megha': 'megha123',
-    'Christi': 'christi123', 'Dilna': 'mango123'
-};
-
-const allClients = [
-    { id: 'cli1', name: 'Nails', cycle: '19–19', posts: 6, videos: 0, status: 'progress', owner: 'Neha' },
-    { id: 'cli2', name: 'Pantry', cycle: '12–12', posts: 9, videos: 0, status: 'completed', owner: 'Neha' },
-    { id: 'cli3', name: 'Tredha', cycle: '19–19', posts: 15, videos: 0, status: 'progress', owner: 'Agney' },
-    { id: 'cli4', name: 'Fabaich', cycle: '17–17', posts: 6, videos: 1, status: 'progress', owner: 'Nived' },
-    { id: 'cli5', name: 'Techolas', cycle: '12–12', posts: 4, videos: 0, status: 'completed', owner: 'Nived' },
-    { id: 'cli6', name: 'Flev', cycle: '19–19', posts: 10, videos: 3, status: 'delayed', owner: 'Agney' },
-    { id: 'cli7', name: 'Alchemy', cycle: '—', posts: 0, videos: 0, status: 'progress', owner: 'Agney' },
-    { id: 'cli8', name: 'Chaya Club', cycle: '—', posts: 6, videos: 0, status: 'progress', owner: 'Neha' },
-    { id: 'cli9', name: 'Matti', cycle: '—', posts: 3, videos: 0, status: 'completed', owner: 'Neha' },
-    { id: 'cli10', name: 'Zohaland', cycle: '—', posts: 6, videos: 0, status: 'delayed', owner: 'Nived' },
-    { id: 'cli11', name: 'Solydenim', cycle: '—', posts: 10, videos: 0, status: 'progress', owner: 'Nived' },
-    { id: 'cli12', name: 'Santa Ma', cycle: '—', posts: 6, videos: 0, status: 'progress', owner: 'Agney' }
-];
+let allClients = JSON.parse(localStorage.getItem('cntrlm_clients')) || defaultClients;
+let completedTasks = new Set(JSON.parse(localStorage.getItem('cntrlm_completed')) || []);
 
 let selectedRoleKey = null;
 let currentMember = null;
-let completedTasks = new Set();
+let currentView = 'grid';
+let activeFilters = { owner: 'all', status: 'all' };
 let progressChart = null;
-let contentSplitChart = null;
+let currentReportClientId = null;
 
 // --- Initialization ---
 function init() {
@@ -41,206 +41,247 @@ function init() {
     initCharts();
 }
 
-// --- Step 1: Role Selection Logic ---
-
-function selectRole(key) {
-    selectedRoleKey = key;
-    
-    // UI Update: Highlight card
-    document.querySelectorAll('.role-card').forEach(card => card.classList.remove('selected'));
-    document.getElementById(`role-${key}`).classList.add('selected');
-    
-    // Enable Continue button
-    const btn = document.getElementById('continue-btn');
-    btn.classList.remove('disabled');
-    
-    // Subtle Haptic/Audio Feedback would go here
-    console.log("Selected Role:", key);
+function syncToCloud() {
+    localStorage.setItem('cntrlm_clients', JSON.stringify(allClients));
+    localStorage.setItem('cntrlm_completed', JSON.stringify(Array.from(completedTasks)));
 }
 
-function proceedToNames() {
-    if (!selectedRoleKey) return;
-    showTeam(selectedRoleKey);
+// --- Utilities ---
+
+function getDaysRemaining(startDateStr) {
+    const startDate = new Date(startDateStr);
+    const today = new Date();
+    const cycleDays = 30;
+    const diffTime = today - startDate;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const remaining = cycleDays - diffDays;
+    return remaining > 0 ? remaining : 0;
 }
 
-// --- Step 2: Member Selection Logic ---
-
-function showTeam(teamKey) {
-    const team = teams[teamKey];
-    document.getElementById('team-title').textContent = team.title;
-    document.getElementById('member-count').textContent = `Select your name among ${team.members.length} members`;
-
-    const list = document.getElementById('member-list');
-    list.innerHTML = team.members.map(name => `
-        <div class="member-card anim-slide-in" onclick="openPasswordModal('${name}')">
-            <div class="avatar-circle">${name[0]}</div>
-            <div class="member-name">${name}</div>
-        </div>
-    `).join('');
-
-    switchScreen('details');
+function getDeadlineClass(days) {
+    if (days > 15) return 'deadline-safe';
+    if (days > 5) return 'deadline-soon';
+    return 'deadline-critical';
 }
 
-function openPasswordModal(name) {
-    window.targetMember = name;
-    document.getElementById('modal-user-name').textContent = name;
-    document.getElementById('password-modal').classList.add('active');
-    document.getElementById('secret-password').value = '';
-    setTimeout(() => document.getElementById('secret-password').focus(), 100);
-}
-
-function checkPassword() {
-    const pwd = document.getElementById('secret-password').value;
-    if (pwd === memberPasswords[window.targetMember]) {
-        currentMember = window.targetMember;
-        closeModal();
-        updateUIForAuth();
-        switchScreen('client-board');
-        renderAllClients();
-        renderKPIs();
-        initCharts();
-    } else {
-        document.getElementById('password-error').style.display = 'block';
-    }
-}
-
-// --- Step 3: Dashboard Operations ---
-
-function renderKPIs() {
-    const total = allClients.length;
-    const completed = allClients.filter(c => c.status === 'completed' || completedTasks.has(c.id)).length;
-    const delayed = allClients.filter(c => c.status === 'delayed').length;
-    const pending = total - completed;
-
-    document.getElementById('kpi-total').textContent = total;
-    document.getElementById('kpi-completed').textContent = completed;
-    document.getElementById('kpi-pending').textContent = pending;
-    document.getElementById('kpi-delayed').textContent = delayed;
-}
-
-function renderAllClients(filteredList = allClients) {
-    const grid = document.getElementById('all-clients-grid');
-    if (!grid) return;
-    grid.innerHTML = '';
-
-    filteredList.forEach((client, index) => {
-        const isOwner = currentMember === client.owner;
-        const isDone = client.status === 'completed' || completedTasks.has(client.id);
-        const progress = isDone ? 100 : (client.status === 'delayed' ? 30 : 65);
-
-        const card = document.createElement('div');
-        card.className = 'client-card';
-        card.style.animationDelay = `${index * 0.05}s`;
-
-        card.innerHTML = `
-            <div class="card-top">
-                <div class="client-label">
-                    <h3>${client.name}</h3>
-                    <span>Cycle: ${client.cycle}</span>
-                </div>
-                <div class="status-badge status-${isDone ? 'completed' : client.status}">
-                    ${isDone ? 'COMPLETED' : client.status.toUpperCase()}
-                </div>
-            </div>
-            <div class="card-stats">
-                <div class="stat-item"><i class="ph ph-image"></i> ${client.posts} Posts</div>
-                <div class="stat-item"><i class="ph ph-video"></i> ${client.videos} Videos</div>
-            </div>
-            <div class="card-progress">
-                <div class="progress-meta"><span>Progress</span><span>${progress}%</span></div>
-                <div class="progress-bar"><div class="progress-fill" style="width: ${progress}%"></div></div>
-            </div>
-            <div class="card-footer">
-                <div class="owner-info"><div class="avatar-sm">${client.owner[0]}</div><span>${client.owner}</span></div>
-                <div class="done-pill ${isDone ? 'active' : ''} ${!isOwner ? 'disabled' : ''}" onclick="toggleClientTask('${client.id}', '${client.owner}')">
-                    <i class="ph ${isDone ? 'ph-check-circle-fill' : 'ph-circle'}"></i><span>${isDone ? 'Done' : 'Mark Done'}</span>
-                </div>
-            </div>
-            ${isOwner ? '<div style="position:absolute; top: 0; right: 0; background: var(--primary); color: white; padding: 2px 8px; font-size: 0.6rem; font-weight: 700; border-radius: 0 0 0 8px;">YOU</div>' : ''}
-        `;
-        grid.appendChild(card);
-    });
-}
-
-function initCharts() {
-    const ctxProgress = document.getElementById('progressChart')?.getContext('2d');
-    const ctxSplit = document.getElementById('contentSplitChart')?.getContext('2d');
-    if (!ctxProgress || !ctxSplit) return;
-
-    if (progressChart) progressChart.destroy();
-    if (contentSplitChart) contentSplitChart.destroy();
-
-    progressChart = new Chart(ctxProgress, {
-        type: 'bar',
-        data: {
-            labels: allClients.map(c => c.name),
-            datasets: [{ label: 'Status', data: allClients.map(c => (completedTasks.has(c.id) || c.status === 'completed') ? 100 : 60), backgroundColor: '#f97316', borderRadius: 4 }]
-        },
-        options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100 } } }
-    });
-
-    contentSplitChart = new Chart(ctxSplit, {
-        type: 'doughnut',
-        data: {
-            labels: ['Posts', 'Videos'],
-            datasets: [{ data: [allClients.reduce((acc, c) => acc + c.posts, 0), allClients.reduce((acc, c) => acc + c.videos, 0)], backgroundColor: ['#f97316', '#3b82f6'], borderWidth: 0 }]
-        },
-        options: { maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom' } } }
-    });
-}
-
-// --- Shared Utilities ---
-
-function updateUIForAuth() {
-    if (currentMember) {
-        document.getElementById('user-display-short').textContent = currentMember;
-    }
-}
-
-function logout() {
-    currentMember = null;
-    selectedRoleKey = null;
-    document.querySelectorAll('.role-card').forEach(card => card.classList.remove('selected'));
-    document.getElementById('continue-btn').classList.add('disabled');
-    switchScreen('dashboard');
-}
-
+// --- Navigation ---
 function switchScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function closeModal() { document.getElementById('password-modal').classList.remove('active'); }
-
-function toggleClientTask(id, owner) {
-    if (currentMember !== owner) return;
-    if (completedTasks.has(id)) completedTasks.delete(id);
-    else completedTasks.add(id);
-    renderAllClients();
-    renderKPIs();
-    initCharts();
+function logout() {
+    currentMember = null; selectedRoleKey = null; switchScreen('dashboard');
+    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('continue-btn')?.classList.add('disabled');
 }
 
-function saveProgress() {
-    const toast = document.getElementById('save-status');
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
+// --- Selection Logic ---
+function selectRole(key) {
+    selectedRoleKey = key;
+    document.querySelectorAll('.role-card').forEach(card => card.classList.remove('selected'));
+    document.getElementById(`role-${key}`).classList.add('selected');
+    document.getElementById('continue-btn').classList.remove('disabled');
 }
 
-function filterClients() {
-    const searchTerm = document.getElementById('clientSearch').value.toLowerCase();
-    const owner = document.getElementById('ownerFilter').value;
-    const status = document.getElementById('statusFilter').value;
+function proceedToNames() {
+    if (selectedRoleKey === 'admin') openPasswordModal('admin');
+    else showTeam(selectedRoleKey);
+}
 
-    const filtered = allClients.filter(c => {
+function showTeam(teamKey) {
+    const team = teams[teamKey];
+    document.getElementById('team-title').textContent = team.title;
+    const list = document.getElementById('member-list');
+    list.innerHTML = team.members.map(name => `<div class="member-card" onclick="openPasswordModal('${name}')"><div class="avatar-circle">${name[0]}</div><div class="member-name">${name}</div></div>`).join('');
+    switchScreen('details');
+}
+
+function openPasswordModal(name) {
+    window.targetMember = name;
+    document.getElementById('modal-user-name').textContent = name === 'admin' ? 'Administrator' : name;
+    document.getElementById('password-modal').classList.add('active');
+    document.getElementById('secret-password').value = '';
+    setTimeout(() => document.getElementById('secret-password').focus(), 100);
+}
+
+function checkPassword() {
+    if (document.getElementById('secret-password').value === memberPasswords[window.targetMember]) {
+        currentMember = window.targetMember;
+        closeModal();
+        if (currentMember === 'admin') { switchScreen('admin-panel'); renderAdminList(); }
+        else { switchScreen('client-board'); renderKPIs(); renderAllClients(); initCharts(); }
+    } else document.getElementById('password-error').style.display = 'block';
+}
+
+// --- Client Board Operations ---
+
+function renderAllClients(filteredList = null) {
+    if (!filteredList) filteredList = getFilteredList();
+    const grid = document.getElementById('all-clients-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    grid.className = `clients-feed ${currentView}-view`;
+
+    filteredList.forEach((client, index) => {
+        const isOwner = currentMember === client.owner;
+        const isDone = client.status === 'completed' || completedTasks.has(client.id);
+        const progress = isDone ? 100 : 65;
+        const days = getDaysRemaining(client.startDate || '2026-03-01');
+
+        const card = document.createElement('div');
+        card.className = 'client-card anim-slide-up';
+        card.style.animationDelay = `${index * 0.05}s`;
+        card.onclick = (e) => { if (!e.target.closest('.done-pill')) openClientReport(client.id); };
+
+        card.innerHTML = `
+            <div class="card-top">
+                <div class="card-top-flex">
+                    <div class="client-label"><h3>${client.name}</h3><span>${client.cycle}</span></div>
+                    <div class="deadline-chip ${getDeadlineClass(days)}">${days} days left</div>
+                </div>
+            </div>
+            <div class="card-stats">
+                <div class="stat-item"><i class="ph ph-image"></i> ${client.posts}</div>
+                <div class="stat-item"><i class="ph ph-video"></i> ${client.videos}</div>
+                <div class="status-badge status-${isDone ? 'completed' : client.status}" style="margin-left: auto;">${isDone ? 'DONE' : client.status.toUpperCase()}</div>
+            </div>
+            <div class="card-progress">
+                <div class="progress-bar"><div class="progress-fill" style="width: ${progress}%"></div></div>
+            </div>
+            <div class="card-footer">
+                <div class="owner-info"><div class="avatar-sm">${client.owner[0]}</div><span>${client.owner}</span></div>
+                <div class="done-pill ${isDone ? 'active' : ''} ${!isOwner ? 'disabled' : ''}" onclick="toggleClientTask('${client.id}', '${client.owner}', event)">
+                    <i class="ph ${isDone ? 'ph-check-circle-fill' : 'ph-circle'}"></i> <span>${isDone ? 'Done' : 'Mark Done'}</span>
+                </div>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+// --- Report Screen Logic ---
+
+function openClientReport(clientId) {
+    currentReportClientId = clientId;
+    const client = allClients.find(c => c.id === clientId);
+    const isDone = client.status === 'completed' || completedTasks.has(client.id);
+    const progress = isDone ? 100 : 65;
+    const days = getDaysRemaining(client.startDate);
+
+    document.getElementById('report-client-name').textContent = client.name;
+    document.getElementById('report-status-badge').className = `status-badge status-${isDone ? 'completed' : client.status}`;
+    document.getElementById('report-status-badge').textContent = isDone ? 'COMPLETED' : client.status.toUpperCase();
+    document.getElementById('report-days-left').textContent = days;
+    document.getElementById('report-progress-pct').textContent = `${progress}%`;
+    document.getElementById('report-progress-fill').style.width = `${progress}%`;
+
+    renderReportLinks(client);
+    renderReportHistory(client);
+    switchScreen('client-report');
+}
+
+function renderReportLinks(client) {
+    const list = document.getElementById('report-link-list');
+    list.innerHTML = client.links.length > 0 ? client.links.map(link => `
+        <div class="link-item">
+            <div class="link-info">
+                <a href="${link.url}" target="_blank">${link.url}</a>
+                <small>Added by ${link.savedBy} on ${link.date}</small>
+            </div>
+            <i class="ph ph-link-simple"></i>
+        </div>
+    `).join('') : '<p style="color:var(--text-muted); font-size:0.9rem;">No links saved yet.</p>';
+}
+
+function renderReportHistory(client) {
+    const list = document.getElementById('report-history-list');
+    list.innerHTML = client.history && client.history.length > 0 ? client.history.map(row => `
+        <tr>
+            <td>${row.month}</td>
+            <td>${row.posts}</td>
+            <td>${row.videos}</td>
+            <td><span class="status-badge status-completed">${row.result}</span></td>
+        </tr>
+    `).join('') : '<tr><td colspan="4" style="text-align:center; padding:2rem; color:var(--text-muted);">No history data found.</td></tr>';
+}
+
+function promptAddLink() {
+    const url = prompt("Enter the URL link to save (e.g. Google Drive, Portfolio):");
+    if (url && currentReportClientId) {
+        const client = allClients.find(c => c.id === currentReportClientId);
+        client.links.push({
+            url: url,
+            savedBy: currentMember || 'Unknown',
+            date: new Date().toLocaleDateString()
+        });
+        syncToCloud();
+        renderReportLinks(client);
+    }
+}
+
+// --- Admin Panel ---
+
+function renderAdminList() {
+    const list = document.getElementById('admin-client-list');
+    list.innerHTML = allClients.map(c => `
+        <tr>
+            <td>${c.name}</td>
+            <td>${c.cycle}</td>
+            <td>${c.posts}P / ${c.videos}V</td>
+            <td>${c.owner}</td>
+            <td><span class="status-badge status-${c.status}">${c.status}</span></td>
+            <td class="action-btns">
+                <button class="edit-btn" onclick="openAdminModal('${c.id}')"><i class="ph ph-note-pencil"></i></button>
+                <button class="delete-btn" onclick="deleteClient('${c.id}')"><i class="ph ph-trash"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// --- Filtering & View Toggles (Same as before but integrated) ---
+function getFilteredList() {
+    const searchTerm = document.getElementById('clientSearch')?.value.toLowerCase() || '';
+    return allClients.filter(c => {
         const matchesSearch = c.name.toLowerCase().includes(searchTerm);
-        const matchesOwner = owner === 'all' || c.owner === owner;
+        const matchesOwner = activeFilters.owner === 'all' || c.owner === activeFilters.owner;
         const isDone = c.status === 'completed' || completedTasks.has(c.id);
-        const matchesStatus = status === 'all' || (status === 'completed' && isDone) || (status === 'pending' && !isDone);
+        const matchesStatus = activeFilters.status === 'all' || (activeFilters.status === 'completed' && isDone) || (activeFilters.status === 'pending' && !isDone);
         return matchesSearch && matchesOwner && matchesStatus;
     });
-    renderAllClients(filtered);
+}
+function setView(view) { currentView = view; renderAllClients(); }
+function setChipFilter(type, value) { activeFilters[type] = value; renderAllClients(); }
+function toggleClientTask(id, owner, e) {
+    e.stopPropagation(); if (currentMember !== owner) return;
+    if (completedTasks.has(id)) completedTasks.delete(id); else completedTasks.add(id);
+    syncToCloud(); renderAllClients(); renderKPIs();
 }
 
+// --- Charts ---
+function initCharts() {
+    const ctx = document.getElementById('progressChart')?.getContext('2d');
+    if (!ctx) return;
+    if (progressChart) progressChart.destroy();
+    progressChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: allClients.map(c => c.name),
+            datasets: [{ label: 'Status', data: allClients.map(c => (completedTasks.has(c.id) || c.status === 'completed') ? 100 : 60), backgroundColor: '#f97316', borderRadius: 8 }]
+        },
+        options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+}
+
+function renderKPIs() {
+    const total = allClients.length;
+    const completed = allClients.filter(c => c.status === 'completed' || completedTasks.has(c.id)).length;
+    document.getElementById('kpi-total').textContent = total;
+    document.getElementById('kpi-completed').textContent = completed;
+    document.getElementById('kpi-pending').textContent = total - completed;
+}
+
+function closeModal() { document.getElementById('password-modal').classList.remove('active'); }
+function filterClients() { renderAllClients(); }
 init();

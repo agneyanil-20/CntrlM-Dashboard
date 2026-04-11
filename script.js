@@ -1,75 +1,64 @@
 // --- Data & State Management ---
 
-// Default Initial Data with Specific Video Production Mappings
 const defaultClients = [
-    { id: 'cli1', name: 'Speeki English', cycle: '19–19', posts: 6, videos: 0, status: 'progress', owner: 'Shaun', startDate: '2026-03-25', links: [], history: [] },
-    { id: 'cli2', name: 'Speeki German', cycle: '12–12', posts: 9, videos: 0, status: 'completed', owner: 'Shaun', startDate: '2026-03-10', links: [], history: [] },
-    { id: 'cli3', name: 'Stray Dogs AI', cycle: '19–19', posts: 15, videos: 0, status: 'progress', owner: 'Adhil', startDate: '2026-03-20', links: [], history: [] },
-    { id: 'cli4', name: 'Fabrich', cycle: '17–17', posts: 6, videos: 1, status: 'progress', owner: 'Adhil', startDate: '2026-03-15', links: [], history: [] },
-    { id: 'cli5', name: 'Techolas', cycle: '12–12', posts: 4, videos: 0, status: 'completed', owner: 'Abhay', startDate: '2026-03-05', links: [], history: [] },
-    { id: 'cli6', name: 'Nails by Rita', cycle: '19–19', posts: 10, videos: 3, status: 'delayed', owner: 'Abhay', startDate: '2026-03-28', links: [], history: [] },
-    { id: 'cli7', name: 'Santa Maria', cycle: '—', posts: 0, videos: 0, status: 'progress', owner: 'Hari', startDate: '2026-03-12', links: [], history: [] },
-    { id: 'cli8', name: 'Soly Denim', cycle: '—', posts: 6, videos: 0, status: 'progress', owner: 'Hari', startDate: '2026-03-18', links: [], history: [] },
-    { id: 'cli9', name: 'Matti', cycle: '—', posts: 3, videos: 0, status: 'completed', owner: 'SIJIN', startDate: '2026-03-22', links: [], history: [] },
-    { id: 'cli10', name: 'Zoholand', cycle: '—', posts: 6, videos: 0, status: 'delayed', owner: 'SIJIN', startDate: '2026-03-26', links: [], history: [] },
-    { id: 'cli11', name: 'Tredha', cycle: '19–19', posts: 12, videos: 0, status: 'progress', owner: 'Agney', startDate: '2026-03-20', links: [], history: [] },
-    { id: 'cli12', name: 'Pantry', cycle: '12–12', posts: 8, videos: 0, status: 'progress', owner: 'Neha', startDate: '2026-03-25', links: [], history: [] }
+    { id: 'cli1', name: 'Speeki English', cycle: '19–19', posts: 6, videos: 0, designOwner: '', videoOwner: 'Shaun', designStatus: 'pending', videoStatus: 'progress', startDate: '2026-03-25', links: [], history: [] },
+    { id: 'cli2', name: 'Speeki German', cycle: '12–12', posts: 9, videos: 0, designOwner: '', videoOwner: 'Shaun', designStatus: 'pending', videoStatus: 'completed', startDate: '2026-03-10', links: [], history: [] },
+    { id: 'cli3', name: 'Stray Dogs AI', cycle: '19–19', posts: 15, videos: 0, designOwner: '', videoOwner: 'Adhil', designStatus: 'pending', videoStatus: 'progress', startDate: '2026-03-20', links: [], history: [] },
+    { id: 'cli4', name: 'Fabrich', cycle: '17–17', posts: 6, videos: 1, designOwner: 'Neha', videoOwner: 'Adhil', designStatus: 'progress', videoStatus: 'progress', startDate: '2026-03-15', links: [], history: [] },
+    { id: 'cli5', name: 'Techolas', cycle: '12–12', posts: 4, videos: 0, designOwner: 'Neha', videoOwner: 'Abhay', designStatus: 'completed', videoStatus: 'completed', startDate: '2026-03-05', links: [], history: [] },
+    { id: 'cli6', name: 'Nails by Rita', cycle: '19–19', posts: 10, videos: 3, designOwner: 'Neha', videoOwner: 'Abhay', designStatus: 'delayed', videoStatus: 'delayed', startDate: '2026-03-28', links: [], history: [] },
+    { id: 'cli7', name: 'Santa Maria', cycle: '—', posts: 0, videos: 0, designOwner: '', videoOwner: 'Hari', designStatus: 'pending', videoStatus: 'progress', startDate: '2026-03-12', links: [], history: [] },
+    { id: 'cli8', name: 'Soly Denim', cycle: '—', posts: 6, videos: 0, designOwner: '', videoOwner: 'Hari', designStatus: 'pending', videoStatus: 'progress', startDate: '2026-03-18', links: [], history: [] },
+    { id: 'cli9', name: 'Matti', cycle: '—', posts: 3, videos: 0, designOwner: '', videoOwner: 'SIJIN', designStatus: 'pending', videoStatus: 'completed', startDate: '2026-03-22', links: [], history: [] },
+    { id: 'cli10', name: 'Zoholand', cycle: '—', posts: 6, videos: 0, designOwner: '', videoOwner: 'SIJIN', designStatus: 'pending', videoStatus: 'delayed', startDate: '2026-03-26', links: [], history: [] },
+    { id: 'cli11', name: 'Tredha', cycle: '19–19', posts: 12, videos: 0, designOwner: 'Agney', videoOwner: '', designStatus: 'progress', videoStatus: 'pending', startDate: '2026-03-20', links: [], history: [] }
 ];
 
 const memberPasswords = {
     'Agney': 'agney123', 'Neha': 'neha123', 'Nived': 'nived123',
     'SIJIN': 'sijin123', 'Abhay': 'abhay123', 'Adhil': 'adil123',
-    'Shaun': 'shawn123', 'Hari': 'hari123', 'Megha': 'megha123',
-    'Christi': 'christi123', 'Dilna': 'mango123', 'admin': 'admin123'
+    'Shaun': 'shawn123', 'Hari': 'hari123', 'admin': 'admin123'
 };
 
 const teams = {
     'graphic-design': { title: 'Graphic Designers', members: ['Agney', 'Neha', 'Nived'] },
-    'video-production': { title: 'Video Editors', members: ['SIJIN', 'Abhay', 'Adhil', 'Shaun', 'Hari'] },
-    'social-media': { title: 'Social Media Managers', members: ['Megha', 'Christi'] },
-    'content-writing': { title: 'Content Writers', members: ['Dilna'] }
+    'video-production': { title: 'Video Editors', members: ['SIJIN', 'Abhay', 'Adhil', 'Shaun', 'Hari'] }
 };
 
-let allClients = JSON.parse(localStorage.getItem('cntrlm_clients')) || defaultClients;
-let completedTasks = new Set(JSON.parse(localStorage.getItem('cntrlm_completed')) || []);
+let allClients = JSON.parse(localStorage.getItem('cntrlm_clients_v4')) || defaultClients;
 
-// IMPORTANT: Overwrite with new mapping if user just provided it
-// This ensures the new mapping takes effect even if localStorage has old data
-const forceNewMapping = true; 
-if (forceNewMapping && !localStorage.getItem('mapping_updated_v2')) {
+if (!localStorage.getItem('mapping_updated_v4')) {
     allClients = defaultClients;
-    localStorage.setItem('cntrlm_clients', JSON.stringify(allClients));
-    localStorage.setItem('mapping_updated_v2', 'true');
+    localStorage.setItem('cntrlm_clients_v4', JSON.stringify(allClients));
+    localStorage.setItem('mapping_updated_v4', 'true');
 }
 
 let selectedRoleKey = null;
 let currentMember = null;
 let currentView = 'grid';
-let activeFilters = { owner: 'all', status: 'all' };
+let activeFilters = { role: 'all', owner: 'all', status: 'all' };
 let progressChart = null;
-let currentReportClientId = null;
 
 // --- Initialization ---
 function init() {
     renderKPIs();
     renderAllClients();
     initCharts();
+    populateOwnerChips();
 }
 
 function syncToCloud() {
-    localStorage.setItem('cntrlm_clients', JSON.stringify(allClients));
-    localStorage.setItem('cntrlm_completed', JSON.stringify(Array.from(completedTasks)));
+    localStorage.setItem('cntrlm_clients_v4', JSON.stringify(allClients));
 }
 
 // --- Utilities ---
-
 function getDaysRemaining(startDateStr) {
     const startDate = new Date(startDateStr);
     const today = new Date();
     const cycleDays = 30;
     const diffTime = today - startDate;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    const remaining = cycleDays - diffDays;
+    const remaining = cycleDays - (diffDays || 0);
     return remaining > 0 ? remaining : 0;
 }
 
@@ -77,6 +66,13 @@ function getDeadlineClass(days) {
     if (days > 15) return 'deadline-safe';
     if (days > 5) return 'deadline-soon';
     return 'deadline-critical';
+}
+
+function getProgressNum(status) {
+    if (status === 'completed') return 100;
+    if (status === 'progress') return 60;
+    if (status === 'delayed') return 30;
+    return 10;
 }
 
 // --- Navigation ---
@@ -92,7 +88,6 @@ function logout() {
     document.getElementById('continue-btn')?.classList.add('disabled');
 }
 
-// --- Selection Logic ---
 function selectRole(key) {
     selectedRoleKey = key;
     document.querySelectorAll('.role-card').forEach(card => card.classList.remove('selected'));
@@ -126,150 +121,214 @@ function checkPassword() {
         currentMember = window.targetMember;
         closeModal();
         if (currentMember === 'admin') { switchScreen('admin-panel'); renderAdminList(); }
-        else { switchScreen('client-board'); renderKPIs(); renderAllClients(); initCharts(); }
-    } else document.getElementById('password-error').style.display = 'block';
+        else { 
+            switchScreen('client-board'); 
+            init(); 
+            document.getElementById('user-display-short').textContent = currentMember; 
+            document.getElementById('user-avatar-tiny').textContent = currentMember[0]; 
+        }
+    } else {
+        document.getElementById('password-error').style.display = 'block';
+    }
 }
 
-// --- Client Board Operations ---
+function closeModal() { document.getElementById('password-modal').classList.remove('active'); }
+
+// --- Filtering ---
+function populateOwnerChips() {
+    const mems = Array.from(new Set([...teams['graphic-design'].members, ...teams['video-production'].members]));
+    const container = document.getElementById('owner-chips');
+    if (!container) return;
+    container.innerHTML = `<span class="chip active" onclick="setChipFilter('owner', 'all')">All</span>` + 
+        mems.map(m => `<span class="chip" onclick="setChipFilter('owner', '${m}')">${m}</span>`).join('');
+}
+
+function setChipFilter(type, value) {
+    activeFilters[type] = value;
+    const container = document.getElementById(`${type}-chips`);
+    if (container) {
+        container.querySelectorAll('.chip').forEach(c => {
+            const isAll = c.textContent.trim() === 'All' && value === 'all';
+            const matchesValue = c.textContent.trim() === value;
+            c.classList.toggle('active', isAll || matchesValue);
+        });
+    }
+    renderAllClients();
+}
+
+function getFilteredList() {
+    const searchTerm = document.getElementById('clientSearch')?.value.toLowerCase() || '';
+    return allClients.filter(c => {
+        const matchesSearch = c.name.toLowerCase().includes(searchTerm);
+        let matchesRole = true;
+        if (activeFilters.role === 'graphic-design') matchesRole = !!c.designOwner;
+        else if (activeFilters.role === 'video-production') matchesRole = !!c.videoOwner;
+        const matchesOwner = activeFilters.owner === 'all' || c.designOwner === activeFilters.owner || c.videoOwner === activeFilters.owner;
+        let matchesStatus = true;
+        if (activeFilters.status === 'completed') matchesStatus = (c.designOwner ? c.designStatus === 'completed' : true) && (c.videoOwner ? c.videoStatus === 'completed' : true);
+        else if (activeFilters.status === 'progress') matchesStatus = (c.designStatus === 'progress' || c.videoStatus === 'progress');
+        return matchesSearch && matchesRole && matchesOwner && matchesStatus;
+    });
+}
 
 function renderAllClients(filteredList = null) {
     if (!filteredList) filteredList = getFilteredList();
     const grid = document.getElementById('all-clients-grid');
     if (!grid) return;
     grid.innerHTML = '';
-    grid.className = `clients-feed ${currentView}-view`;
+    grid.className = `clients-feed ${currentView}-view role-based-grid`;
 
     filteredList.forEach((client, index) => {
-        const isOwner = currentMember === client.owner;
-        const isDone = client.status === 'completed' || completedTasks.has(client.id);
-        const progress = isDone ? 100 : 65;
-        const days = getDaysRemaining(client.startDate || '2026-03-01');
-
+        const days = getDaysRemaining(client.startDate);
         const card = document.createElement('div');
-        card.className = 'client-card anim-slide-up';
+        card.className = 'client-card split-layout anim-slide-up';
         card.style.animationDelay = `${index * 0.05}s`;
-        card.onclick = (e) => { if (!e.target.closest('.done-pill')) openClientReport(client.id); };
+
+        const sections = [
+            { type: 'design', label: 'Design', icon: 'paint-brush', owner: client.designOwner, status: client.designStatus },
+            { type: 'video', label: 'Video Editing', icon: 'video-camera', owner: client.videoOwner, status: client.videoStatus }
+        ];
+
+        let sectionsHTML = '';
+        sections.forEach(s => {
+            if (!s.owner) return;
+            const isDone = s.status === 'completed';
+            const isOwner = currentMember === s.owner;
+            const btnClass = isOwner ? (isDone ? 'btn-mark-done active' : 'btn-mark-done') : 'btn-mark-done disabled';
+            const progress = getProgressNum(s.status);
+            const btnText = isOwner ? (isDone ? 'Done' : 'Mark Done') : (isDone ? 'Done' : 'Assigned to ' + s.owner);
+
+            sectionsHTML += `
+                <div class="task-section ${s.type}-section">
+                    <div class="section-top">
+                        <div class="section-label"><i class="ph ph-${s.icon}"></i> ${s.label}</div>
+                        <span class="status-badge status-${s.status}">${s.status.toUpperCase()}</span>
+                    </div>
+                    <div class="owner-chip">
+                        <div class="avatar-sm" style="background:#0F3F41">${s.owner[0]}</div>
+                        <span>${s.owner}</span>
+                    </div>
+                    <div class="progress-bar-thin"><div class="progress-fill-thin bg-${s.status}" style="width: ${progress}%;"></div></div>
+                    <div class="${btnClass}" onclick="toggleTask('${client.id}', '${s.type}', event)">
+                        <i class="ph ${isDone ? 'ph-check-circle-fill' : 'ph-circle'}"></i> <span>${btnText}</span>
+                    </div>
+                </div>
+            `;
+        });
 
         card.innerHTML = `
-            <div class="card-top">
+            <div class="card-top" style="margin-bottom: 1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 1rem;">
                 <div class="card-top-flex">
-                    <div class="client-label"><h3>${client.name}</h3><span>${client.cycle}</span></div>
+                    <div class="client-label"><h3>${client.name}</h3></div>
                     <div class="deadline-chip ${getDeadlineClass(days)}">${days} days left</div>
                 </div>
             </div>
-            <div class="card-stats">
-                <div class="stat-item"><i class="ph ph-image"></i> ${client.posts}</div>
-                <div class="stat-item"><i class="ph ph-video"></i> ${client.videos}</div>
-                <div class="status-badge status-${isDone ? 'completed' : client.status}" style="margin-left: auto;">${isDone ? 'DONE' : client.status.toUpperCase()}</div>
-            </div>
-            <div class="card-progress">
-                <div class="progress-bar"><div class="progress-fill" style="width: ${progress}%"></div></div>
-            </div>
-            <div class="card-footer">
-                <div class="owner-info"><div class="avatar-sm">${client.owner[0]}</div><span>${client.owner}</span></div>
-                <div class="done-pill ${isDone ? 'active' : ''} ${!isOwner ? 'disabled' : ''}" onclick="toggleClientTask('${client.id}', '${client.owner}', event)">
-                    <i class="ph ${isDone ? 'ph-check-circle-fill' : 'ph-circle'}"></i> <span>${isDone ? 'Done' : 'Mark Done'}</span>
-                </div>
-            </div>
+            <div class="split-sections">${sectionsHTML}</div>
         `;
+        // Allow everyone to view report but restrict edits inside
+        card.onclick = (e) => { if (!e.target.closest('.btn-mark-done')) openClientReport(client.id); };
         grid.appendChild(card);
     });
 }
 
-// --- Report Screen Logic ---
+function toggleTask(id, type, e) {
+    e.stopPropagation();
+    const client = allClients.find(c => c.id === id);
+    if (!client) return;
+    const owner = type === 'design' ? client.designOwner : client.videoOwner;
+    if (currentMember !== owner) return; // STRICT PERMISSION
 
+    if (type === 'design') client.designStatus = client.designStatus === 'completed' ? 'progress' : 'completed';
+    else client.videoStatus = client.videoStatus === 'completed' ? 'progress' : 'completed';
+    
+    syncToCloud(); 
+    renderAllClients(); 
+    renderKPIs();
+    initCharts();
+}
+
+// --- Report Screen ---
 function openClientReport(clientId) {
-    currentReportClientId = clientId;
     const client = allClients.find(c => c.id === clientId);
-    const isDone = client.status === 'completed' || completedTasks.has(client.id);
-    const progress = isDone ? 100 : 70;
-    const days = getDaysRemaining(client.startDate);
-
+    window.currentReportClientId = clientId;
+    const isOwner = client.designOwner === currentMember || client.videoOwner === currentMember;
+    
     document.getElementById('report-client-name').textContent = client.name;
-    document.getElementById('report-status-badge').className = `status-badge status-${isDone ? 'completed' : client.status}`;
-    document.getElementById('report-status-badge').textContent = isDone ? 'COMPLETED' : client.status.toUpperCase();
-    document.getElementById('report-days-left').textContent = days;
-    document.getElementById('report-progress-pct').textContent = `${progress}%`;
-    document.getElementById('report-progress-fill').style.width = `${progress}%`;
+    document.getElementById('report-status-badge').textContent = 'CLIENT OVERVIEW';
+    document.getElementById('report-days-left').textContent = getDaysRemaining(client.startDate);
+    
+    const overallProgress = ((client.designOwner ? getProgressNum(client.designStatus) : 0) + (client.videoOwner ? getProgressNum(client.videoStatus) : 0)) / ((client.designOwner ? 1 : 0) + (client.videoOwner ? 1 : 0));
+    document.getElementById('report-progress-pct').textContent = Math.round(overallProgress) + '%';
+    document.getElementById('report-progress-fill').style.width = overallProgress + '%';
+
+    // Show/Hide Edit tools based on ownership
+    const editBtn = document.querySelector('.btn-add-detail') || document.createElement('button');
+    if (isOwner) {
+        editBtn.className = 'btn-primary btn-add-detail';
+        editBtn.innerHTML = '<i class="ph ph-note-pencil"></i> Edit Details';
+        editBtn.onclick = () => editClientDetails(client);
+        if (!document.querySelector('.btn-add-detail')) document.querySelector('.report-header-main').appendChild(editBtn);
+    } else if (document.querySelector('.btn-add-detail')) {
+        document.querySelector('.btn-add-detail').remove();
+    }
 
     renderReportLinks(client);
-    renderReportHistory(client);
     switchScreen('client-report');
+}
+
+function editClientDetails(client) {
+    const newPosts = prompt(`Edit Post Count (Current: ${client.posts})`, client.posts);
+    const newVideos = prompt(`Edit Video Count (Current: ${client.videos})`, client.videos);
+    const newCycle = prompt(`Edit Date Cycle (Current: ${client.cycle})`, client.cycle);
+    
+    if (newPosts !== null) client.posts = parseInt(newPosts);
+    if (newVideos !== null) client.videos = parseInt(newVideos);
+    if (newCycle !== null) client.cycle = newCycle;
+    
+    syncToCloud();
+    openClientReport(client.id);
+    renderAllClients();
 }
 
 function renderReportLinks(client) {
     const list = document.getElementById('report-link-list');
-    list.innerHTML = client.links.length > 0 ? client.links.map(link => `
+    const isOwner = client.designOwner === currentMember || client.videoOwner === currentMember;
+    list.innerHTML = client.links.map(link => `
         <div class="link-item">
-            <div class="link-info">
-                <a href="${link.url}" target="_blank">${link.url}</a>
-                <small>Added by ${link.savedBy} on ${link.date}</small>
-            </div>
-            <i class="ph ph-link-simple"></i>
+            <div class="link-info"><a href="${link.url}" target="_blank">${link.url}</a><small>Added by ${link.savedBy}</small></div>
+            <i class="ph ph-link"></i>
         </div>
-    `).join('') : '<p style="color:var(--text-muted); font-size:0.9rem;">No links saved yet.</p>';
-}
-
-function renderReportHistory(client) {
-    const list = document.getElementById('report-history-list');
-    list.innerHTML = client.history && client.history.length > 0 ? client.history.map(row => `
-        <tr><td>${row.month}</td><td>${row.posts}</td><td>${row.videos}</td><td><span class="status-badge status-completed">${row.result}</span></td></tr>
-    `).join('') : '<tr><td colspan="4" style="text-align:center; padding:2rem; color:var(--text-muted);">No history data found.</td></tr>';
+    `).join('') + (isOwner ? `<button class="btn-sm outline" onclick="promptAddLink()">+ Add Link</button>` : '');
 }
 
 function promptAddLink() {
-    const url = prompt("Enter the URL link to save (e.g. Google Drive, Portfolio):");
-    if (url && currentReportClientId) {
-        const client = allClients.find(c => c.id === currentReportClientId);
-        client.links.push({
-            url: url,
-            savedBy: currentMember || 'Unknown',
-            date: new Date().toLocaleDateString()
-        });
+    const url = prompt("Enter Link URL:");
+    if (url) {
+        const client = allClients.find(c => c.id === window.currentReportClientId);
+        client.links.push({ url, savedBy: currentMember, date: new Date().toLocaleDateString() });
         syncToCloud();
         renderReportLinks(client);
     }
 }
 
-// --- Admin Panel ---
-
-function renderAdminList() {
-    const list = document.getElementById('admin-client-list');
-    list.innerHTML = allClients.map(c => `
-        <tr>
-            <td>${c.name}</td>
-            <td>${c.cycle}</td>
-            <td>${c.posts}P / ${c.videos}V</td>
-            <td>${c.owner}</td>
-            <td><span class="status-badge status-${c.status}">${c.status}</span></td>
-            <td class="action-btns">
-                <button class="edit-btn" onclick="openAdminModal('${c.id}')"><i class="ph ph-note-pencil"></i></button>
-                <button class="delete-btn" onclick="deleteClient('${c.id}')"><i class="ph ph-trash"></i></button>
-            </td>
-        </tr>
-    `).join('');
-}
-
-// --- Filtering & View Toggles ---
-function getFilteredList() {
-    const searchTerm = document.getElementById('clientSearch')?.value.toLowerCase() || '';
-    return allClients.filter(c => {
-        const matchesSearch = c.name.toLowerCase().includes(searchTerm);
-        const matchesOwner = activeFilters.owner === 'all' || c.owner === activeFilters.owner;
-        const isDone = c.status === 'completed' || completedTasks.has(c.id);
-        const matchesStatus = activeFilters.status === 'all' || (activeFilters.status === 'completed' && isDone) || (activeFilters.status === 'pending' && !isDone);
-        return matchesSearch && matchesOwner && matchesStatus;
+// --- KPI & Analytics ---
+function renderKPIs() {
+    let total = 0; let done = 0; let pending = 0; let progress = 0;
+    allClients.forEach(c => {
+        [c.designStatus, c.videoStatus].forEach((s, i) => {
+            if ((i === 0 && !c.designOwner) || (i === 1 && !c.videoOwner)) return;
+            total++;
+            if (s === 'completed') done++;
+            else if (s === 'delayed') pending++;
+            else progress++;
+        });
     });
-}
-function setView(view) { currentView = view; renderAllClients(); }
-function setChipFilter(type, value) { activeFilters[type] = value; renderAllClients(); }
-function toggleClientTask(id, owner, e) {
-    e.stopPropagation(); if (currentMember !== owner) return;
-    if (completedTasks.has(id)) completedTasks.delete(id); else completedTasks.add(id);
-    syncToCloud(); renderAllClients(); renderKPIs();
+    document.getElementById('kpi-total').textContent = total;
+    document.getElementById('kpi-completed').textContent = done;
+    document.getElementById('kpi-pending').textContent = pending;
+    if (document.getElementById('kpi-active')) document.getElementById('kpi-active').textContent = progress;
 }
 
-// --- Charts ---
 function initCharts() {
     const ctx = document.getElementById('progressChart')?.getContext('2d');
     if (!ctx) return;
@@ -278,25 +337,14 @@ function initCharts() {
         type: 'bar',
         data: {
             labels: allClients.map(c => c.name),
-            datasets: [{ label: 'Status', data: allClients.map(c => (completedTasks.has(c.id) || c.status === 'completed') ? 100 : 70), backgroundColor: '#FF6A00', borderRadius: 8 }]
+            datasets: [{ label: 'Progress %', data: allClients.map(c => {
+                let t = 0; let d = 0; if(c.designOwner){t++;if(c.designStatus==='completed')d++;}if(c.videoOwner){t++;if(c.videoStatus==='completed')d++;}
+                return t > 0 ? (d/t)*100 : 0;
+            }), backgroundColor: '#FF6A00', borderRadius: 8 }]
         },
         options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 }
 
-function renderKPIs() {
-    const total = allClients.length;
-    const completed = allClients.filter(c => c.status === 'completed' || completedTasks.has(c.id)).length;
-    const delayed = allClients.filter(c => c.status === 'delayed' && !completedTasks.has(c.id)).length;
-    const active = total - completed - delayed;
-    document.getElementById('kpi-total').textContent = total;
-    document.getElementById('kpi-completed').textContent = completed;
-    document.getElementById('kpi-pending').textContent = delayed;
-    if (document.getElementById('kpi-active')) {
-        document.getElementById('kpi-active').textContent = active;
-    }
-}
-
-function closeModal() { document.getElementById('password-modal').classList.remove('active'); }
 function filterClients() { renderAllClients(); }
 init();

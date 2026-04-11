@@ -177,20 +177,26 @@
                 </div>
                 <div class="filter-chips">
                     <div class="chip-group">
-                        <span class="chip-label">Owner:</span>
-                        <div class="chips" id="owner-chips">
-                            <span class="chip active" onclick="setChipFilter('owner', 'all')">All</span>
-                            <span class="chip" onclick="setChipFilter('owner', 'Agney')">Agney</span>
-                            <span class="chip" onclick="setChipFilter('owner', 'Neha')">Neha</span>
-                            <span class="chip" onclick="setChipFilter('owner', 'Nived')">Nived</span>
+                        <span class="chip-label">Role Filter:</span>
+                        <div class="chips" id="role-chips">
+                            <span class="chip active" onclick="setChipFilter('role', 'all')">All</span>
+                            <span class="chip" onclick="setChipFilter('role', 'graphic-design')">Designers</span>
+                            <span class="chip" onclick="setChipFilter('role', 'video-production')">Video Editors</span>
                         </div>
                     </div>
                     <div class="chip-group">
-                        <span class="chip-label">Status:</span>
+                        <span class="chip-label">Owner Filter:</span>
+                        <div class="chips" id="owner-chips">
+                            <span class="chip active" onclick="setChipFilter('owner', 'all')">All</span>
+                            <!-- Dynamically generated -->
+                        </div>
+                    </div>
+                    <div class="chip-group">
+                        <span class="chip-label">Status Filter:</span>
                         <div class="chips" id="status-chips">
                             <span class="chip active" onclick="setChipFilter('status', 'all')">All</span>
                             <span class="chip" onclick="setChipFilter('status', 'completed')">Completed</span>
-                            <span class="chip" onclick="setChipFilter('status', 'pending')">In Progress</span>
+                            <span class="chip" onclick="setChipFilter('status', 'progress')">In Progress</span>
                         </div>
                     </div>
                 </div>

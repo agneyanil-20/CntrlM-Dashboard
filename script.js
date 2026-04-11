@@ -278,7 +278,7 @@ function initCharts() {
         type: 'bar',
         data: {
             labels: allClients.map(c => c.name),
-            datasets: [{ label: 'Status', data: allClients.map(c => (completedTasks.has(c.id) || c.status === 'completed') ? 100 : 70), backgroundColor: '#f97316', borderRadius: 8 }]
+            datasets: [{ label: 'Status', data: allClients.map(c => (completedTasks.has(c.id) || c.status === 'completed') ? 100 : 70), backgroundColor: '#FF6A00', borderRadius: 8 }]
         },
         options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
@@ -287,9 +287,14 @@ function initCharts() {
 function renderKPIs() {
     const total = allClients.length;
     const completed = allClients.filter(c => c.status === 'completed' || completedTasks.has(c.id)).length;
+    const delayed = allClients.filter(c => c.status === 'delayed' && !completedTasks.has(c.id)).length;
+    const active = total - completed - delayed;
     document.getElementById('kpi-total').textContent = total;
     document.getElementById('kpi-completed').textContent = completed;
-    document.getElementById('kpi-pending').textContent = total - completed;
+    document.getElementById('kpi-pending').textContent = delayed;
+    if (document.getElementById('kpi-active')) {
+        document.getElementById('kpi-active').textContent = active;
+    }
 }
 
 function closeModal() { document.getElementById('password-modal').classList.remove('active'); }

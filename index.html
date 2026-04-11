@@ -6,7 +6,7 @@
     <title>Cntrl M | Team Management Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- UI Libraries -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -104,7 +104,7 @@
                 <div class="kpi-card glass">
                     <div class="kpi-header">
                         <div class="kpi-icon blue"><i class="ph ph-clipboard-text"></i></div>
-                        <span class="trend up">Total</span>
+                        <span class="kpi-label">Total</span>
                     </div>
                     <div class="kpi-body">
                         <h4 id="kpi-total">0</h4>
@@ -114,7 +114,7 @@
                 <div class="kpi-card glass">
                     <div class="kpi-header">
                         <div class="kpi-icon green"><i class="ph ph-check-circle"></i></div>
-                        <span class="trend up">Done</span>
+                        <span class="kpi-label">Done</span>
                     </div>
                     <div class="kpi-body">
                         <h4 id="kpi-completed">0</h4>
@@ -124,11 +124,21 @@
                 <div class="kpi-card glass">
                     <div class="kpi-header">
                         <div class="kpi-icon yellow"><i class="ph ph-clock-countdown"></i></div>
-                        <span class="trend down">Active</span>
+                        <span class="kpi-label">Pending</span>
                     </div>
                     <div class="kpi-body">
                         <h4 id="kpi-pending">0</h4>
                         <p>Pending</p>
+                    </div>
+                </div>
+                <div class="kpi-card glass">
+                    <div class="kpi-header">
+                        <div class="kpi-icon orange"><i class="ph ph-activity"></i></div>
+                        <span class="kpi-label">Active</span>
+                    </div>
+                    <div class="kpi-body">
+                        <h4 id="kpi-active">0</h4>
+                        <p>Active</p>
                     </div>
                 </div>
             </section>
